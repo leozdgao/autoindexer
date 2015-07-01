@@ -96,5 +96,6 @@ This DOM structure is totally a mess, but my indexer still work, and the result 
 
 ##  TODO
 
+- Restrict depth of the index. (default to 3)
 - Add transition animation for anchor.
 - Maybe a jQuery plugin version?
