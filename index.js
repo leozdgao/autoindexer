@@ -1,6 +1,20 @@
-;function(scope){
-  // expose to public
-  scope.autoIndex = function (article) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], function () {
+            return (root['autoIndex'] = factory());
+        });
+    } else if (typeof exports === 'object') {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like enviroments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals
+        root['autoIndex'] = factory();
+    }
+}(this, function () {
+  function autoIndex(article) {
     // get headers in rootEle
     var nodes = [];
     traverse(article, function(n) {
@@ -178,4 +192,6 @@
 
     return this;
   };
-}(this);
+
+  return autoIndex;
+}));
