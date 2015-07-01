@@ -57,6 +57,7 @@
     function createAnchor(data) {
       var a = document.createElement('a');
       a.href = '#' + data.anchor;
+      a.target = '_self';
       a.textContent = data.title;
       return a;
     }
@@ -177,4 +178,4 @@
 
     return this;
   };
-}(this)
+}(this);
