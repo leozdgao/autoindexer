@@ -67,30 +67,32 @@ It will generate a structure like this:
     - 4
  - 5
 
+#### Explain
 
- Although the level of first H2 is smaller then the H1 which next to it, but H2 occured first. H2 can't hold H1 as its children, so H1 become the sibling of H2, but check the last H2, it can't be held as a children by H3, so it find H1 as its parent, so the last H2 become the sibling of the middle H2.
+
+Although the level of first H2 is smaller then the H1 which next to it, but H2 occured first. H2 can't hold H1 as its children, so H1 become the sibling of H2, but check the last H2, it can't be held as a children by H3, so it find H1 as its parent, so the last H2 become the sibling of the middle H2.
 
 
- Or, you may consider about the nesting structure like this:
+Or, you may consider about the nesting structure like this:
 
- ```html
- <h2>1</h2>
- <div>
-   <p>Content</p>
-   <h1>2</h1>
- </div>
- <h2>3</h2>
- <div>
-   <h3>4</h3>
-   <p>Content</p>
-   <div>
-     <h2>5</h2>
-   </div>
- </div>
- ```
+```html
+<h2>1</h2>
+<div>
+  <p>Content</p>
+  <h1>2</h1>
+</div>
+<h2>3</h2>
+<div>
+  <h3>4</h3>
+  <p>Content</p>
+  <div>
+    <h2>5</h2>
+  </div>
+</div>
+```
 
- This DOM structure is totally a mess, but my indexer still work, and the result is the same as the last example.
- :smile:
+This DOM structure is totally a mess, but my indexer still work, and the result is the same as the last example.
+:smile:
 
 ##  TODO
 
