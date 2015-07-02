@@ -198,5 +198,5 @@
     return this;
   };
 
-  return createIndexer;
+  return AutoIndexer;
 }));
