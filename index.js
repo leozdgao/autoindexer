@@ -14,74 +14,82 @@
         root['autoIndex'] = factory();
     }
 }(this, function () {
-  function autoIndex(article) {
-    // get headers in rootEle
-    var nodes = [];
-    traverse(article, function(n) {
-      var match = /^H([1-6])$/.exec(n.tagName);
-      if(match != null) {
-        var node = {
-          level: match[1],
-          anchor: n.id,
-          title: n.textContent || n.innerText
+  /**
+   * Genrator of an autoIndexer according the options
+   * @param  {Object} opts - options for auto indexer
+   * @return {Function} An autoIndexer
+   */
+  function autoIndex(opts) {
+    opts = opts || {};
+    var maxLevel = opts.maxLevel || 3; // max level, default to 3
+
+    return function (article) {
+      // get headers in rootEle
+      var nodes = [];
+      traverse(article, function(n) {
+        var match = /^H([1-6])$/.exec(n.tagName);
+        if(match != null) {
+          var node = {
+            level: match[1],
+            anchor: n.id,
+            title: n.textContent || n.innerText
+          }
+          nodes.push(node);
         }
-        nodes.push(node);
-      }
-    });
+      });
 
-    var root = new Node({level: 0}), last = root, ele, result;
-    root.fromArray(nodes, function(cur, last) { // construct Node
-      return last.data.level < cur.data.level;
-    }).traverse(function(data) { // traverse tree node and construct DOM
-      if(this.isRoot()) ele = result = domUl();
-      else {
-        if(this.isSibling(last.parent)) ele = ele.parentNode.parentNode;
+      var root = new Node({level: 0}); // a fake root node
+      root.fromArray(nodes, function(cur, last) { // construct Node
+        return last.data.level < cur.data.level;
+      });
 
+      return construct(root, domUl());
+
+      function construct(node, ele) {
         var li = domLi(), newl;
-        li.appendChild(createAnchor(data));
+        li.appendChild(createAnchor(node.data));
 
-        if(this.hasChildren()) {
-          var newl = domUl();
-          li.appendChild(newl);
+        if(node.hasChildren() && node.getDepth() != maxLevel) {
+          var children = node.children;
+          for(var i = 0, l = children.length; i < l; i++) {
+            var ul = construct(children[i], domUl());
+            li.appendChild(ul);
+          }
         }
+        ele.appendChild(li)
 
-        ele.appendChild(li);
-        if(newl) ele = newl;
-
-        last = this;
+        return ele;
       }
-    });
 
-    return result;
+      // traverse dom node
+      function traverse(node, action, filter) {
+        if(typeof action != 'function') throw 'action should be a function.';
+        if(typeof filter != 'function' || filter(node)) action.call(null, node);
 
-    // traverse dom node
-    function traverse(node, action, filter) {
-      if(typeof action != 'function') throw 'action should be a function.';
-      if(typeof filter != 'function' || filter(node)) action.call(null, node);
-
-      var children = Array.prototype.slice.call(node.children), l = children.length;
-      if(l > 0) {
-        for(var i = 0; i < l; i++) {
-          traverse(children[i], action, filter);
+        var children = Array.prototype.slice.call(node.children), l = children.length;
+        if(l > 0) {
+          for(var i = 0; i < l; i++) {
+            traverse(children[i], action, filter);
+          }
         }
       }
-    }
 
-    // create anchor node by data
-    function createAnchor(data) {
-      var a = document.createElement('a');
-      a.href = '#' + data.anchor;
-      a.target = '_self';
-      a.textContent = data.title;
-      return a;
-    }
+      // create anchor node by data
+      function createAnchor(data) {
+        var a = document.createElement('a');
+        a.href = '#' + data.anchor;
+        a.target = '_self';
+        a.textContent = data.title;
+        return a;
+      }
 
-    function domUl() {
-      return document.createElement('ul');
-    }
+      function domUl() {
+        return document.createElement('ul');
+      }
 
-    function domLi() {
-      return document.createElement('li');
+      function domLi() {
+        return document.createElement('li');
+      }
     }
   }
 
@@ -122,6 +130,18 @@
   };
 
   /**
+   * Get depth of tree node.
+   * @return {Number}
+   */
+  Node.prototype.getDepth = function () {
+    var i = 0, p = this.parent;
+    while(p != null) {
+      i++; p = p.parent;
+    }
+    return i;
+  };
+
+  /**
    * Append node to a parent node.
    * @param  {Node} parent - parent node to append to
    * @return {Node} return parent node
@@ -144,23 +164,6 @@
     if(child instanceof Node) {
       this.children.push(child);
       child.parent = this;
-    }
-  };
-
-  /**
-   * Depth-first traversal, a function will be called everytime traverse to a node,
-   * it take data as the first argument, and the execute content is binded to Node itself.
-   * @param  {Function} action - an action to execute
-   * @return {Node} return itself
-   */
-  Node.prototype.traverse = function traverse(action) {
-    if(typeof action != 'function') throw 'action should be a function.';
-
-    action.call(this, this.data);
-    if(this.children.length > 0) { // not leaf
-      for(var i = 0, l = this.children.length; i < l; i++) {
-        this.children[i].traverse(action);
-      }
     }
 
     return this;
