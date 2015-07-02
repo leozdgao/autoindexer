@@ -14,15 +14,17 @@
         root['autoIndex'] = factory();
     }
 }(this, function () {
+  var AutoIndexer = {};
   /**
    * Genrator of an autoIndexer according the options
    * @param  {Object} opts - options for auto indexer
    * @return {Function} An autoIndexer
    */
-  function autoIndex(opts) {
+  AutoIndexer.createIndexer = function(opts) {
     opts = opts || {};
     var maxLevel = opts.maxLevel || 3; // max level, default to 3
 
+    // an indexer
     return function (article) {
       // get headers in rootEle
       var nodes = [];
@@ -196,5 +198,5 @@
     return this;
   };
 
-  return autoIndex;
+  return createIndexer;
 }));

@@ -1,5 +1,5 @@
 # AutoIndexer
-Generate index automatically for your article.
+Generate index automatically for your article. Use umd, so it can be bundled by browserify/webpack if you'd like to.
 
 ## How to use
 
@@ -26,10 +26,11 @@ If I have my article structure like this:
 Then just pass the article node to it:
 
 ```javascript
+var indexer = createIndexer();
 var articleNode = document.getElementById('article');
 var index = document.getElementById('index');
-var dom = autoIndex(articleNode);
-index.appendChild(dom);
+var ul = indexer(articleNode);
+index.appendChild(ul);
 ```
 
 It returns a UL node and you can decide which node it append to.
@@ -39,6 +40,12 @@ It returns a UL node and you can decide which node it append to.
  - Title2
 - Title3
  - Title4
+
+#### Options
+
+|Options|Description|
+|-------|-----------|
+|maxLevel|Max hierarchal level of index, default to 3.|
 
 ## How it work
 
@@ -67,8 +74,6 @@ It will generate a structure like this:
     - 4
  - 5
 
-#### Explain
-
 
 Although the level of first H2 is smaller then the H1 which next to it, but H2 occured first. H2 can't hold H1 as its children, so H1 become the sibling of H2, but check the last H2, it can't be held as a children by H3, so it find H1 as its parent, so the last H2 become the sibling of the middle H2.
 
@@ -96,7 +101,6 @@ This DOM structure is totally a mess, but my indexer still work, and the result 
 
 ##  TODO
 
-- Restrict depth of the index. (default to 3)
 - Expose style interface.
 - Add transition animation for anchor.
 - Maybe a jQuery plugin version?
