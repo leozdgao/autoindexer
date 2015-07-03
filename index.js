@@ -45,22 +45,27 @@
         return last.data.level < cur.data.level;
       });
 
-      return construct(root, domUl());
+      var result = domUl(), children = root.children;
+      for(var i = 0, l = children.length; i < l; i++) {
+        result.appendChild(construct(children[i]));
+      }
 
-      function construct(node, ele) {
-        var li = domLi(), newl;
+      return result;
+
+      // construct a single node
+      function construct(node) {
+        var li = domLi();
         li.appendChild(createAnchor(node.data));
 
         if(node.hasChildren() && node.getDepth() != maxLevel) {
-          var children = node.children;
+          var children = node.children, ele = domUl();
           for(var i = 0, l = children.length; i < l; i++) {
-            var ul = construct(children[i], domUl());
-            li.appendChild(ul);
+            ele.appendChild(construct(children[i], domUl()));
+            li.appendChild(ele);
           }
         }
-        ele.appendChild(li)
 
-        return ele;
+        return li;
       }
 
       // traverse dom node
