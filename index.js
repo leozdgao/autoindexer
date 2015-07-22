@@ -26,10 +26,10 @@
 
       // an indexer
     return {
-      getMaxLevel () {
+      getMaxLevel: function() {
         return maxLevel;
       },
-      getNode (article) {
+      getNode: function(article) {
         var nodes = [];
         traverse(article, function(n) {
           var match = /^H([1-6])$/.exec(n.tagName);
@@ -63,7 +63,7 @@
           }
         }
       },
-      construct (article) {
+      construct: function(article) {
         var root = this.getNode(article);
         var result = domUl(), children = root.children;
         for(var i = 0, l = children.length; i < l; i++) {
