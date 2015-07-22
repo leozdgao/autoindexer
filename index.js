@@ -88,23 +88,23 @@
           return li;
         }
       }
+    }
 
-      // create anchor node by data
-      function createAnchor(data) {
-        var a = document.createElement('a');
-        a.href = location.pathname + '#' + data.anchor;
-        a.target = '_self';
-        a.textContent = data.title;
-        return a;
-      }
+    // create anchor node by data
+    function createAnchor(data) {
+      var a = document.createElement('a');
+      a.href = location.pathname + '#' + data.anchor;
+      a.target = '_self';
+      a.textContent = data.title;
+      return a;
+    }
 
-      function domUl() {
-        return document.createElement('ul');
-      }
+    function domUl() {
+      return document.createElement('ul');
+    }
 
-      function domLi() {
-        return document.createElement('li');
-      }
+    function domLi() {
+      return document.createElement('li');
     }
   }
 
