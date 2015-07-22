@@ -24,67 +24,75 @@
     opts = opts || {};
     var maxLevel = opts.maxLevel || 3; // max level, default to 3
 
-    // an indexer
-    return function (article) {
-      // get headers in rootEle
-      var nodes = [];
-      traverse(article, function(n) {
-        var match = /^H([1-6])$/.exec(n.tagName);
-        if(match != null) {
-          var node = {
-            level: match[1],
-            anchor: n.id,
-            title: n.textContent || n.innerText
+      // an indexer
+    return {
+      getMaxLevel () {
+        return maxLevel;
+      },
+      getNode (article) {
+        var nodes = [];
+        traverse(article, function(n) {
+          var match = /^H([1-6])$/.exec(n.tagName);
+          if(match != null) {
+            var node = {
+              level: match[1],
+              anchor: n.id,
+              title: n.textContent || n.innerText
+            }
+            nodes.push(node);
           }
-          nodes.push(node);
-        }
-      });
+        });
 
-      var root = new Node({level: 0}); // a fake root node
-      root.fromArray(nodes, function(cur, last) { // construct Node
-        return last.data.level < cur.data.level;
-      });
+        var root = new Node({level: 0}); // a fake root node
+        root.fromArray(nodes, function(cur, last) { // construct Node
+          return last.data.level < cur.data.level;
+        });
 
-      var result = domUl(), children = root.children;
-      for(var i = 0, l = children.length; i < l; i++) {
-        result.appendChild(construct(children[i]));
-      }
+        return root;
 
-      return result;
+        // traverse dom node
+        function traverse(node, action, filter) {
+          if(typeof action != 'function') throw 'action should be a function.';
+          if(typeof filter != 'function' || filter(node)) action.call(null, node);
 
-      // construct a single node
-      function construct(node) {
-        var li = domLi();
-        li.appendChild(createAnchor(node.data));
-
-        if(node.hasChildren() && node.getDepth() != maxLevel) {
-          var children = node.children, ele = domUl();
-          for(var i = 0, l = children.length; i < l; i++) {
-            ele.appendChild(construct(children[i], domUl()));
-            li.appendChild(ele);
+          var children = Array.prototype.slice.call(node.children), l = children.length;
+          if(l > 0) {
+            for(var i = 0; i < l; i++) {
+              traverse(children[i], action, filter);
+            }
           }
         }
+      },
+      construct (article) {
+        var root = this.getNode(article);
+        var result = domUl(), children = root.children;
+        for(var i = 0, l = children.length; i < l; i++) {
+          result.appendChild(construct(children[i]));
+        }
 
-        return li;
-      }
+        return result;
 
-      // traverse dom node
-      function traverse(node, action, filter) {
-        if(typeof action != 'function') throw 'action should be a function.';
-        if(typeof filter != 'function' || filter(node)) action.call(null, node);
+        // construct a single node
+        function construct(node) {
+          var li = domLi();
+          li.appendChild(createAnchor(node.data));
 
-        var children = Array.prototype.slice.call(node.children), l = children.length;
-        if(l > 0) {
-          for(var i = 0; i < l; i++) {
-            traverse(children[i], action, filter);
+          if(node.hasChildren() && node.getDepth() != maxLevel) {
+            var children = node.children, ele = domUl();
+            for(var i = 0, l = children.length; i < l; i++) {
+              ele.appendChild(construct(children[i], domUl()));
+              li.appendChild(ele);
+            }
           }
+
+          return li;
         }
       }
 
       // create anchor node by data
       function createAnchor(data) {
         var a = document.createElement('a');
-        a.href = '#' + data.anchor;
+        a.href = location.pathname + '#' + data.anchor;
         a.target = '_self';
         a.textContent = data.title;
         return a;
